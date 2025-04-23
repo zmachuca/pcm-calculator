@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCM Plan Savings Calculator</title>
+    <style>
+        :root {
+            --primary-color: #1A3B22;
+            --secondary-color: #B5B18C;
+            --accent-color: #2A6E45;
+            --light-color: #FFFFFF;
+            --dark-color: #333333;
+            --error-color: #D32F2F;
+            --success-color: #388E3C;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #F5F5F5;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .calculator-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        .calculator-header {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .calculator-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .calculator-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .calculator-body {
+            padding: 30px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(42, 110, 69, 0.2);
+        }
+
+        .form-group .error {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .info-text {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: var(--transition);
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .results-section {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #ddd;
+        }
+
+        .results-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .result-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .result-card .amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .result-card .description {
+            font-size: 14px;
+            color: var(--dark-color);
+        }
+
+        .breakdown {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+        }
+
+        .breakdown h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .breakdown-item .label {
+            font-weight: bold;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .cta-section p {
+            margin-bottom: 15px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--light-color);
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .cta-btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        .email-form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+
+        .email-form h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .calculator-footer {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .calculator-footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        .calculator-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .calculator-container {
+                margin: 10px;
+            }
+
+            .calculator-body {
+                padding: 20px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="calculator-header">
+            <h1>PCM Plan Savings Calculator</h1>
+            <p>Estimate your business's potential savings with the Preventive Care Management Program</p>
+        </div>
+        <div class="calculator-body">
+            <div class="input-section">
+                <h2>Enter Your Business Information</h2>
+                <div class="info-text">
+                    The PCM Plan helps businesses with 50+ employees reduce payroll tax liability through the Preventive Care Management Program. This calculator will estimate your potential savings.
+                </div>
+                <div class="form-group">
+                    <label for="employee-count">Number of Employees</label>
+                    <input type="number" id="employee-count" min="1" placeholder="Enter number of employees (minimum 50)" required>
+                    <div class="error" id="employee-count-error">Please enter a valid number of employees (minimum 50)</div>
+                </div>
+            </div>
+
+            <div class="email-form">
+                <h3>Get Your Savings Estimate</h3>
+                <p>Enter your contact information to see your potential savings:</p>
+                <div class="form-group">
+                    <label for="company-name">Company Name</label>
+                    <input type="text" id="company-name" placeholder="Enter your company name" required>
+                    <div class="error" id="company-name-error">Please enter your company name</div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email address" required>
+                    <div class="error" id="email-error">Please enter a valid email address</div>
+                </div>
+                <button id="calculate-btn" class="btn">Calculate My Savings</button>
+            </div>
+
+            <div class="results-section" id="results-section">
+                <h2>Your Estimated PCM Plan Savings</h2>
+                
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Monthly Savings</h3>
+                        <div class="amount" id="monthly-savings">$0</div>
+                        <div class="description">Estimated monthly savings for your business</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>Annual Savings</h3>
+                        <div class="amount" id="annual-savings">$0</div>
+                        <div class="description">Estimated annual savings for your business</div>
+                    </div>
+                </div>
+
+                <div class="breakdown">
+                    <h3>Savings Breakdown (Per Employee)</h3>
+                    <div class="breakdown-item">
+                        <div class="label">FICA Tax Savings (7.65% of $14,400)</div>
+                        <div class="value">$1,101.60</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="label">PCM Plan Monthly Fee</div>
+                        <div class="value">$35.00</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="label">PCM Plan Annual Fee</div>
+                        <div class="value">$420.00</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="label">Net Monthly Savings Per Employee</div>
+                        <div class="value">$56.80</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="label">Net Annual Savings Per Employee</div>
+                        <div class="value">$681.60</div>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <p>Ready to start saving with the PCM Plan? Schedule a consultation with our team to learn more.</p>
+                    <a href="https://candorfinancial.io" class="cta-btn" target="_blank">Request a Consultation</a>
+                </div>
+            </div>
+        </div>
+        <div class="calculator-footer">
+            <p>Powered by <a href="https://candorfinancial.io" target="_blank">Candor Financial Solutions</a> | © 2025 All Rights Reserved</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculate-btn');
+            const employeeCountInput = document.getElementById('employee-count');
+            const companyNameInput = document.getElementById('company-name');
+            const emailInput = document.getElementById('email');
+            const resultsSection = document.getElementById('results-section');
+            const monthlySavings = document.getElementById('monthly-savings');
+            const annualSavings = document.getElementById('annual-savings');
+            
+            const employeeCountError = document.getElementById('employee-count-error');
+            const companyNameError = document.getElementById('company-name-error');
+            const emailError = document.getElementById('email-error');
+
+            // Constants for calculation
+            const FICA_RATE = 0.0765;
+            const ACTUARIAL_BENEFIT = 14400;
+            const MONTHLY_FEE = 35;
+            const ANNUAL_FEE = MONTHLY_FEE * 12;
+            const FICA_SAVINGS = ACTUARIAL_BENEFIT * FICA_RATE;
+            const NET_ANNUAL_SAVINGS = FICA_SAVINGS - ANNUAL_FEE;
+            const NET_MONTHLY_SAVINGS = NET_ANNUAL_SAVINGS / 12;
+
+            // Format currency
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(amount);
+            }
+
+            // Validate email format
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            // Calculate savings
+            function calculateSavings() {
+                // Reset error messages
+                employeeCountError.style.display = 'none';
+                companyNameError.style.display = 'none';
+                emailError.style.display = 'none';
+
+                // Validate inputs
+                let isValid = true;
+
+                const employeeCount = parseInt(employeeCountInput.value);
+                if (isNaN(employeeCount) || employeeCount < 50) {
+                    employeeCountError.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (!companyNameInput.value.trim()) {
+                    companyNameError.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (!isValidEmail(emailInput.value)) {
+                    emailError.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    return;
+                }
+
+                // Calculate savings
+                const totalMonthly = NET_MONTHLY_SAVINGS * employeeCount;
+                const totalAnnual = NET_ANNUAL_SAVINGS * employeeCount;
+
+                // Display results
+                monthlySavings.textContent = formatCurrency(totalMonthly);
+                annualSavings.textContent = formatCurrency(totalAnnual);
+                resultsSection.style.display = 'block';
+
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // Event listeners
+            calculateBtn.addEventListener('click', calculateSavings);
+
+            // Input validation
+            employeeCountInput.addEventListener('input', function() {
+                if (parseInt(this.value) >= 50 || this.value === '') {
+                    employeeCountError.style.display = 'none';
+                }
+            });
+
+            companyNameInput.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    companyNameError.style.display = 'none';
+                }
+            });
+
+            emailInput.addEventListener('input', function() {
+                if (isValidEmail(this.value) || this.value === '') {
+                    emailError.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
